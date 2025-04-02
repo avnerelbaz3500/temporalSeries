@@ -2,35 +2,61 @@
 title: "Main"
 author: "HADDOUCHE Théo, EL BAZ Avner"
 date: "`r Sys.Date()`"
-output:
-  pdf_document:
-    latex_engine: xelatex
-    header-includes:
-      - \usepackage{tcolorbox}
-      - \definecolor{beigeRosé}{HTML}{EB8664}
-      - \newtcolorbox[]{answerbox}[2][]{colback=orange!10, coltitle=black, boxrule=0mm, arc=2mm, title= Correction #2,left=0pt, #1, breakable}
-      - \newboolean{showanswers}
-      - \setboolean{showanswers}{true}
-      - \newcommand{\hideanswer}[1]{%
-          \ifthenelse{\boolean{showanswers}}{%
-            {\setlength{\parindent}{0pt}
-            \begin{answerbox}[colback=orange!5, colframe=beigeRosé!60, coltitle=black,left=0pt]{}
-            \allowdisplaybreaks
-              #1
-            \end{answerbox}%
-            }%
-          }{}%
-        }
+output: pdf_document
 ---
-
-## Import et délimitation du dataset
+## Introduction
+### Librairies
 
 ```{r}
+library(tseries)
 library(readr)
-valeurs_mensuelles <- read_delim("valeurs_mensuelles.csv", delim = ";", col_types = cols())
-head(valeurs_mensuelles)
 ```
 
+### Import et délimitation du dataset
+
+```{r}
+
+valeurs_mensuelles <- read_delim("valeurs_mensuelles.csv", delim = ";", col_types = cols())
+vm <- valeurs_mensuelles[-c(1, 2, 3), ]
+colnames(vm) <- c("date","value","code")  
+vm <- vm[nrow(vm):1, ]
+vm$value <- as.numeric(vm$value)
+vm$diff <- c(NA,diff(vm$value))
+
+str(vm)
+
+head(vm)
+```
+
+## Part I :  The Data
 1.  What does the chosen series represent ? (sector, potential data processing, logarithmic transformation, etc.)
 
-1.  
+La série représente la production
+
+2. Transform the series to make it stationary if necessary (differentiate it, correct the deterministic
+trend, etc.). Thoroughly justify your choices.
+
+```{r}
+serie_ts <- ts(vm$value, start = c(1990, 01), frequency = 12) 
+diff_series <- ts(vm$diff, start = c(1990, 02), frequency = 12) 
+# Test de Dickey-Fuller augmenté
+diff_series <- na.omit(diff_series) 
+adf_test <- adf.test(diff_series, alternative="stationary")
+print(adf_test)
+```
+
+3. Graphically represent the chosen series before and after transforming it.
+
+```{r}
+
+plot(serie_ts, main="Série Temporelle", xlab="Temps", ylab="Valeur")
+plot(diff_series, main="Série Temporelle Différenciée", xlab="Temps", ylab="Valeur")
+```
+
+2.  Transform the series to make it stationary if necessary (differentiate it, correct the deterministic trend, etc.). Thoroughly justify your choices.
+
+```{r}
+
+
+
+```
