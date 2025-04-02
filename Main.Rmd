@@ -1,6 +1,14 @@
 ---
 title: "Main"
-output: html_document
+author: "HADDOUCHE Théo, EL BAZ Avner"
+date: "`r Sys.Date()`"
+output: pdf_document
 ---
 
 
+
+```{r}
+library(readr)
+valeurs_mensuelles <- read_csv("valeurs_mensuelles.csv")
+head(valeurs_mensuelles)
+```
