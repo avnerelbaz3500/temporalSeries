@@ -2,13 +2,35 @@
 title: "Main"
 author: "HADDOUCHE Théo, EL BAZ Avner"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
+    header-includes:
+      - \usepackage{tcolorbox}
+      - \definecolor{beigeRosé}{HTML}{EB8664}
+      - \newtcolorbox[]{answerbox}[2][]{colback=orange!10, coltitle=black, boxrule=0mm, arc=2mm, title= Correction #2,left=0pt, #1, breakable}
+      - \newboolean{showanswers}
+      - \setboolean{showanswers}{true}
+      - \newcommand{\hideanswer}[1]{%
+          \ifthenelse{\boolean{showanswers}}{%
+            {\setlength{\parindent}{0pt}
+            \begin{answerbox}[colback=orange!5, colframe=beigeRosé!60, coltitle=black,left=0pt]{}
+            \allowdisplaybreaks
+              #1
+            \end{answerbox}%
+            }%
+          }{}%
+        }
 ---
 
-
+## Import et délimitation du dataset
 
 ```{r}
 library(readr)
-valeurs_mensuelles <- read_csv("valeurs_mensuelles.csv")
+valeurs_mensuelles <- read_delim("valeurs_mensuelles.csv", delim = ";", col_types = cols())
 head(valeurs_mensuelles)
 ```
+
+1.  What does the chosen series represent ? (sector, potential data processing, logarithmic transformation, etc.)
+
+1.  

@@ -9,7 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="HADDOUCHE Théo, EL BAZ Avner" />
 
+<meta name="date" content="2025-04-02" />
 
 <title>Main</title>
 
@@ -349,11 +351,76 @@ display: none;
 
 
 <h1 class="title toc-ignore">Main</h1>
+<h4 class="author">HADDOUCHE Théo, EL BAZ Avner</h4>
+<h4 class="date">2025-04-02</h4>
 
 </div>
 
 
-
+title: “Mon Rapport” author: “Moi” date: “2025-04-02” output:
+pdf_document: latex_engine: xelatex # Si tu utilises une police
+spécifique comme XCharter header-includes: -
+<ul>
+<li><ul>
+<li>% Pour la traduction française
+<ul>
+<li></li>
+<li>% Police NewPX</li>
+<li></li>
+<li></li>
+<li></li>
+<li>% Times New Roman</li>
+<li>% marges</li>
+<li>% Pour gérer les colonnes</li>
+<li>% Pour générer du texte fictif</li>
+<li></li>
+<li> % Bibliothèque pour les calculs</li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li> # Pour afficher les réponses</li>
+<li>[2][]{colback=orange!10, coltitle=black, boxrule=0mm, arc=2mm,
+title= Correction #2,left=0pt, #1, breakable}</li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li><h2 id="pour-souligner-les-url"> # Pour souligner les URL</h2></li>
+</ul></li>
+</ul></li>
+</ul>
+<div id="import-et-délimitation-du-dataset" class="section level2">
+<h2>Import et délimitation du dataset</h2>
+<pre class="r"><code>library(readr)
+valeurs_mensuelles &lt;- read_delim(&quot;valeurs_mensuelles.csv&quot;, delim = &quot;;&quot;, col_types = cols())
+head(valeurs_mensuelles)</code></pre>
+<pre><code>## # A tibble: 6 × 3
+##   Libellé              Indice brut de la production industrielle (base 1…¹ Codes
+##   &lt;chr&gt;                &lt;chr&gt;                                               &lt;chr&gt;
+## 1 idBank               010768165                                           &lt;NA&gt; 
+## 2 Dernière mise à jour 05/03/2025 08:45                                    &lt;NA&gt; 
+## 3 Période              &lt;NA&gt;                                                &lt;NA&gt; 
+## 4 2025-01              107.87                                              A    
+## 5 2024-12              133.27                                              A    
+## 6 2024-11              126.43                                              A    
+## # ℹ abbreviated name:
+## #   ¹​`Indice brut de la production industrielle (base 100 en 2021) - Construction aéronautique et spatiale (NAF rév. 2, niveau groupe, poste 30.3)`</code></pre>
+<ol style="list-style-type: decimal">
+<li><p>What does the chosen series represent ? (sector, potential data
+processing, logarithmic transformation, etc.)</p></li>
+<li></li>
+</ol>
+</div>
 
 
 
