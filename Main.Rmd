@@ -4,7 +4,9 @@ author: "HADDOUCHE Théo, EL BAZ Avner"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
+
 ## Introduction
+
 ### Librairies
 
 ```{r}
@@ -18,83 +20,66 @@ library(ggplot2)
 
 ```{r}
 
-valeurs_mensuelles <- read_delim("valeurs_mensuelles.csv", delim = ";", col_types = cols())
+valeurs_mensuelles <- read_delim("sorbe.csv", delim = ";", col_types = cols())
 vm <- valeurs_mensuelles[-c(1, 2, 3), ]
+
 colnames(vm) <- c("date","value","code")  
 vm <- vm[nrow(vm):1, ]
 vm$value <- as.numeric(vm$value)
-vm$diff <- c(NA,diff(vm$value))
 
-str(vm)
+vm$log <- log(vm$value)
+vm$diff <- c(NA,diff(vm$value, lag = 1))
+vm$season <-  c(rep(NA, 12), diff(vm$value, lag = 12))
+vm$seasonlog <- c(rep(NA, 12), diff(vm$log, lag = 12))
 
 head(vm)
 ```
 
-## Part I :  The Data
+## Part I : The Data
+
 1.  What does the chosen series represent ? (sector, potential data processing, logarithmic transformation, etc.)
 
 La série représente la production
 
-2. Transform the series to make it stationary if necessary (differentiate it, correct the deterministic
-trend, etc.). Thoroughly justify your choices.
+2.  Transform the series to make it stationary if necessary (differentiate it, correct the deterministic trend, etc.). Thoroughly justify your choices.
 
 ```{r}
+
 serie_ts <- ts(vm$value, start = c(1990, 01), frequency = 12) 
+
 diff_series <- ts(vm$diff, start = c(1990, 02), frequency = 12) 
 diff_series <- na.omit(diff_series) 
+
+season_series <- ts(vm$season, start = c(1991, 02), frequency = 12) 
+season_series <- na.omit(season_series)
+
+seasonlog_series <- ts(vm$seasonlog, start = c(1991, 02), frequency = 12) 
+seasonlog_series <- na.omit(seasonlog_series) 
+
 # Dickey-Fuller Test
 adf.test(serie_ts, alternative="stationary")
+adf.test(season_series, alternative="stationary")
 adf.test(diff_series, alternative="stationary")
+adf.test(seasonlog_series, alternative="stationary")
 pp.test(diff_series, alternative="stationary")
 kpss.test((diff_series))
 
 
 ```
 
-3. Graphically represent the chosen series before and after transforming it.
+3.  Graphically represent the chosen series before and after transforming it.
 
 ```{r}
 
 plot(serie_ts, main="Série Temporelle", xlab="Temps", ylab="Valeur")
-plot(diff_series, main="Série Temporelle Différenciée", xlab="Temps", ylab="Valeur")
+plot(diff_series, main="Série Temporelle Différenciée (lag 1)", xlab="Temps", ylab="Valeur")
+plot(season_series, main="Série Temporelle Différenciée (lag 12)", xlab="Temps", ylab="Valeur")
+plot(seasonlog_series, main="Série Temporelle Différenciée (loglag 12)", xlab="Temps", ylab="Valeur")
 ```
 
 ## Part II : ARMA models
 
-4. Pick (and justify your choice) an ARMA(p,q) model for your corrected time series Xt. Estimate the model parameters and check its validity.
-```{r}
-# Calculer l'ACF et le PACF
-acf_values <- acf(diff_series, lag.max = 50, plot = FALSE)
-pacf_values <- pacf(diff_series, lag.max = 50, plot = FALSE)
-
-# Inspecter la structure de l'objet
-str(acf_values)
-str(pacf_values)
-
-# Extraire les valeurs d'ACF et de PACF correctement
-acf_vals <- acf_values$acf[,,1]  # Ajustez selon la structure réelle
-pacf_vals <- pacf_values$acf[,,1]  # Ajustez selon la structure réelle
-
-length_acf <- length(acf_vals)
-length_pacf <- length(pacf_vals)
-
-# Créer les DataFrames pour ggplot2
-acf_df <- data.frame(Lag = 0:(length_acf - 1), ACF = acf_vals)
-pacf_df <- data.frame(Lag = 0:(length_pacf - 1), PACF = pacf_vals)
-
-# Tracer l'ACF avec ggplot2
-ggplot(acf_df, aes(x = Lag, y = ACF)) +
-  geom_bar(stat = "identity") +
-  geom_hline(yintercept = c(-1.96/sqrt(length(diff_series)), 1.96/sqrt(length(diff_series))), linetype="dashed", color="blue") +
-  labs(title="ACF de la série différenciée", x="Lag", y="ACF")
-
-# Tracer le PACF avec ggplot2
-ggplot(pacf_df, aes(x = Lag, y = PACF)) +
-  geom_bar(stat = "identity") +
-  geom_hline(yintercept = c(-1.96/sqrt(length(diff_series)), 1.96/sqrt(length(diff_series))), linetype="dashed", color="blue") +
-  labs(title="PACF de la série différenciée", x="Lag", y="PACF")
-
-```
+4.  Pick (and justify your choice) an ARMA(p,q) model for your corrected time series Xt. Estimate the model parameters and check its validity.
 
 ```{r}
 
@@ -102,18 +87,18 @@ ggplot(pacf_df, aes(x = Lag, y = PACF)) +
 par(mfrow=c(1,2), mar=c(5,4,4,2) + 0.1)
 
 # Tracer l'ACF avec un ajustement de l'axe des abscisses
-acf(diff_series, main="ACF de diff_series", lag.max = 21, xlab="Lag")
+acf(seasonlog_series, main="ACF de diff_series", lag.max = 21, xlab="Lag")
 
 
 # Tracer le PACF avec un ajustement de l'axe des abscisses
-pacf(diff_series, main="PACF de diff_series", lag.max = 21)
+pacf(seasonlog_series, main="PACF de diff_series", lag.max = 21)
 
 # Réinitialiser la disposition des graphiques
 par(mfrow=c(1,1))
 
 ```
-On peut voir que 
 
+On peut voir que
 
 ```{r}
 # Charger les bibliothèques nécessaires
@@ -154,7 +139,6 @@ print(results)
 
 ```
 
-
 ```{r}
 ggplot(results, aes(x = factor(p), y = factor(q), fill = AIC)) +
   geom_tile() +
@@ -175,15 +159,15 @@ ggplot(results, aes(x = factor(p), y = factor(q), fill = BIC)) +
   theme_minimal()
 ```
 
-
 ```{r}
-best_model <- auto.arima(diff_series, ic="aic", seasonal = FALSE, approximation = FALSE, trace=TRUE)
+best_model <- auto.arima(seasonlog_series, ic="aic", seasonal = FALSE, approximation = FALSE, trace=TRUE)
 summary(best_model)
 ```
-5. Write the ARIMA(p,d,q) model for the chosen series.
+
+5.  Write the ARIMA(p,d,q) model for the chosen series.
 
 ```{r}
-modele_arima <- Arima(serie_ts, order = c(2, 1, 1))
+modele_arima <- Arima(seasonlog_series, order = c(3, 0, 5))
 summary(modele_arima)
 ```
 
@@ -192,4 +176,3 @@ Tracé des résidus
 ```{r}
 checkresiduals(modele_arima)
 ```
-
